@@ -45,13 +45,18 @@ class Tile:
 
 class Board:
 
-    def __init__(self, cells=Tile.from_number(-1), board_size=8):
-        self.cells = cells
+    def __init__(self, cells=None, board_size=8):
         self.board_size = board_size
+        if cells is None:
+            self.cells = self.init_board()
+        else:
+            self.cells = cells
+        
 
 
-    def board(self):
-        board = [[self.cells for c in range(self.board_size)] for c in range(self.board_size)]
+    def init_board(self):
+        blank_cell = Tile.from_number(-1)
+        board = [[blank_cell for c in range(self.board_size)] for c in range(self.board_size)]
         board[3][3] = Tile.from_number(0)
         board[3][4] = Tile.from_number(1)
         board[4][3] = Tile.from_number(1)
@@ -59,11 +64,17 @@ class Board:
         return board
 
 
+    def color_cell(self, x, y, input_color):
+        self.cells[x][y] = input_color
+        return self
+
+
 class DrawBoard:
 
     def __init__(self, board=None, board_size=8):
-        self.board = Board().board()
+        self.board = Board().init_board()
         self.board_size = board_size
+
 
     def drawboard(self):
         """
@@ -78,6 +89,24 @@ class DrawBoard:
         for b in range(self.board_size):
             print(col[b], *self.board[b])
 
+        
+class Player:
+
+    def __init__(self) -> None:
+        pass
+
+
+    def player_input(self):
+        x = input('入力してください x : ')
+        y = input('入力してください y : ')
+        return x, y
+
+
+
+
+
+
+        
 
 
 class Round:
@@ -92,6 +121,7 @@ class Round:
         player2 = 'B'
         players = [player1, player2]
         return players
+
 
 class Checker:
     def __init__(self) -> None:
@@ -234,13 +264,24 @@ class Checker:
             position.append(self.check_left(board, x, y, input_tile))
             position.append(self.check_upper_left(board, x, y, input_tile))
         return position
-
+   
 
     def position(self, board, input_tile):
         """
         置ける場所をリストでリターンする
         """
-        position = []
-        for x in board:
-            for y in x:
-                place = self.adjacent_check(board, x, y, input_tile)
+        checked_list = []
+        for x in range(7):
+            for y in range(7):
+                checked = Checker().adjacent_check(board, x, y, input_tile)
+                for i in checked:
+                    if i != None:
+                        checked_list.append(i)
+        return checked_list
+
+
+def main():
+    game = DrawBoard().drawboard()
+
+if __name__ == '__main__':
+    main()

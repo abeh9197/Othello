@@ -1,15 +1,10 @@
 import unittest
-from reversi import Board, DrawBoard, Tile, Game, TileValue, Checker
+from reversi import Board, DrawBoard, Tile, Game, TileValue, Checker, Player
 
 class UnitTest(unittest.TestCase):
 
-    def test_drawboard(self):
-        b = DrawBoard().drawboard()
-
-
-    # def test_color(self):
-    #     b = DrawBoard().board
-    #     print(b[2][2].value.value['color'])
+    def test_init_board(self):
+        b = Board()
 
     
     # def test_blank(self):
@@ -33,10 +28,13 @@ class UnitTest(unittest.TestCase):
     #     input_tile = Tile.from_number(1)
         # print(Checker().check_up(b, 4, 5, input_tile))
 
-    def test_Checker(self):
-        b = DrawBoard().board
-        input_tile = Tile.from_number(1)
-        for x in range(7):
-            for y in range(7):
-                print(Checker().adjacent_check(b, x, y, input_tile))
+    # def test_Checker(self):
+    #     b = DrawBoard().board
+    #     input_tile = Tile.from_number(1)
+    #     print(Checker().position(b, input_tile))
 
+
+    def test_color_cell(self):
+        b = Board()
+        b = b.color_cell(4, 5, Tile.from_number(1))
+        print(b)
