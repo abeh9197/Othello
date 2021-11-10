@@ -1,14 +1,45 @@
 from enum import Enum
+from typing import List, Tuple
+
+
+def game_start():
+    """Model"""
+    game = Game()
+    init_board = Board(cells=None, board_size=8)
+    draw_board(init_board)
+    x, y = game.get_input()
+    board = init_board
+    board = board.get_from_input(x, y, input_color=0) # NOTE: 色は仮
+    draw_board(board)
+
+
+def draw_board(board):
+    return DrawBoard(board)
 
 
 class Game():
+    """Model"""
 
     def __init__(self):
         self.player = Player()
-        self.drawboard = DrawBoard().drawboard()
+        
+    def get_input(self):
+        return self.player.player_input()
+
+
+class Player:
+    """Controller"""
+    def __init__(self):
+        pass
+
+    def player_input(self) -> Tuple:
+        x = int(input('入力してください x : '))
+        y = int(input('入力してください y : '))
+        return x, y
 
 
 class TileValue(Enum):
+    """Model"""
 
     blank = {'color': 'blank', 'vis': '□', 'num': -1}
     dark = {'color': 'dark', 'vis': '○', 'num': 0}
@@ -23,6 +54,7 @@ class TileValue(Enum):
 
 
 class Tile:
+    """Model"""
 
     def __init__(self, value):
         self.value: TileValue = value
@@ -42,7 +74,7 @@ class Tile:
 
 
 class Board:
-
+    """Model"""
     def __init__(self, cells=None, board_size=8):
         self.board_size = board_size
         if cells is None:
@@ -50,7 +82,7 @@ class Board:
         else:
             self.cells = cells
 
-    def init_board(self):
+    def init_board(self) -> List:
         blank_cell = Tile.from_number(-1)
         board = [[blank_cell for c in range(self.board_size)]
                  for c in range(self.board_size)]
@@ -58,18 +90,25 @@ class Board:
         board[3][4] = Tile.from_number(1)
         board[4][3] = Tile.from_number(1)
         board[4][4] = Tile.from_number(0)
-        return board
+        self.cells = board
+        return self.cells
 
-    def color_cell(self, x, y, input_color):
-        self.cells[x][y] = input_color
+    @property
+    def _board_size(self):
+        return self.board_size
+
+    def get_from_input(self, x, y, input_color: int):
+        self.cells[x][y] = Tile.from_number(input_color)
+        print(self.cells)
         return self
 
 
 class DrawBoard:
-
-    def __init__(self, board=None, board_size=8):
-        self.board = Board().init_board()
-        self.board_size = board_size
+    """View"""
+    def __init__(self, board: Board):
+        self.board = board.cells
+        self.board_size = board.board_size
+        self.draw = self.drawboard()
 
     def drawboard(self):
         """
@@ -81,29 +120,21 @@ class DrawBoard:
         row = ['\nX', 0, 1, 2, 3, 4, 5, 6, 7]
         col = [0, 1, 2, 3, 4, 5, 6, 7]
         print(*row)
+        print(self.board)
         for b in range(self.board_size):
             print(col[b], *self.board[b])
 
 
-class Player:
-
-    def __init__(self):
-        pass
-
-    def player_input(self):
-        x = input('入力してください x : ')
-        y = input('入力してください y : ')
-        return x, y
-
-
 class Round:
-
+    """Model"""
     def __init__(self, players, count) -> None:
         self.players = players
         self.count = count
 
 
 class Checker:
+    """Model"""
+
     def __init__(self) -> None:
         pass
 
@@ -244,16 +275,3 @@ class Checker:
                     if i is not None:
                         checked_list.append(i)
         return checked_list
-
-
-def main():
-    print('hoge')
-
-
-if __name__ == '__main__':
-    main()
-
-
-def game_start():
-    game = Game()
-    game.player.player_input()
