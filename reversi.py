@@ -1,56 +1,68 @@
 from enum import Enum
-from typing import List, Tuple
+from typing import List, Protocol, Tuple
 
 
 def game_start():
     """Model"""
     game = Game()
-    init_board = Board(cells=None, board_size=8)
+    status = Status()
+    init_board = Board(cells=None)
     draw_board(init_board)
-    x, y = game.get_input()
-    board = init_board
-    board = board.get_from_input(x, y, input_color=0) # NOTE: 色は仮
-    draw_board(board)
+    while game.not_done:
+        x, y = game.get_input()
+        board = init_board
+        board = board.get_from_input(x, y, input_color=status.current_player)
+        status.change_player()
+        draw_board(board)
 
 
 def draw_board(board):
     return DrawBoard(board)
 
 
-class Game():
+class Game:
     """Model"""
 
     def __init__(self):
         self.player = Player()
-        
+
     def get_input(self):
         return self.player.player_input()
+
+    @property
+    def not_done(self):
+        done = 0
+        return done == 0
 
 
 class Player:
     """Controller"""
+
     def __init__(self):
         pass
 
     def player_input(self) -> Tuple:
-        x = int(input('入力してください x : '))
-        y = int(input('入力してください y : '))
+        """
+        TODO: need assertion error
+        """
+        x = int(input("入力してください x : "))
+        y = int(input("入力してください y : "))
         return x, y
 
 
 class TileValue(Enum):
     """Model"""
 
-    blank = {'color': 'blank', 'vis': '□', 'num': -1}
-    dark = {'color': 'dark', 'vis': '○', 'num': 0}
-    light = {'color': 'light', 'vis': '●', 'num': 1}
+    blank = {"color": "blank", "vis": "□", "num": -1}
+    dark = {"color": "dark", "vis": "○", "num": 0}
+    light = {"color": "light", "vis": "●", "num": 1}
 
     @staticmethod
     def from_number(num: int):
         for t in TileValue:
-            if t.value['num'] == num:
+            if t.value["num"] == num:
                 return t
-        raise ValueError('Invalid number. Expected number is 0 or 1')
+        raise ValueError("Invalid number. Expected number is 0 or 1")
 
 
 class Tile:
@@ -60,13 +72,13 @@ class Tile:
         self.value: TileValue = value
 
     def __str__(self) -> str:
-        return str(self.value.value['vis'])
+        return str(self.value.value["vis"])
 
     def __repr__(self) -> str:
         return str(self)
 
     def __hash__(self) -> int:
-        return int(self.value.value['num'])
+        return int(self.value.value["num"])
 
     @staticmethod
     def from_number(n: int):
@@ -75,8 +87,9 @@ class Tile:
 
 class Board:
     """Model"""
-    def __init__(self, cells=None, board_size=8):
-        self.board_size = board_size
+
+    def __init__(self, cells=None):
+        self.board_size: int = 8
         if cells is None:
             self.cells = self.init_board()
         else:
@@ -84,8 +97,9 @@ class Board:
 
     def init_board(self) -> List:
         blank_cell = Tile.from_number(-1)
-        board = [[blank_cell for c in range(self.board_size)]
-                 for c in range(self.board_size)]
+        board = [
+            [blank_cell for c in range(self.board_size)] for c in range(self.board_size)
+        ]
         board[3][3] = Tile.from_number(0)
         board[3][4] = Tile.from_number(1)
         board[4][3] = Tile.from_number(1)
@@ -105,6 +119,7 @@ class Board:
 
 class DrawBoard:
     """View"""
+
     def __init__(self, board: Board):
         self.board = board.cells
         self.board_size = board.board_size
@@ -117,22 +132,34 @@ class DrawBoard:
         """
         FIXME: のちのちrow, colを１〜８にしたい（入力と整合性をとる）
         """
-        row = ['\nX', 0, 1, 2, 3, 4, 5, 6, 7]
+        row = ["\nX", 0, 1, 2, 3, 4, 5, 6, 7]
         col = [0, 1, 2, 3, 4, 5, 6, 7]
         print(*row)
-        print(self.board)
+        # print(self.board)
         for b in range(self.board_size):
             print(col[b], *self.board[b])
 
 
-class Round:
+class Status:
     """Model"""
-    def __init__(self, players, count) -> None:
-        self.players = players
-        self.count = count
+
+    def __init__(self) -> None:
+        self.turn: int = 0
+        self.current_player: int = 0
+        self.manager = Manager()
+    
+    def change_player(self):
+        if self.current_player == 0:
+            self.current_player = 1
+        elif self.current_player == 1:
+            self.current_player = 0
+    
+    def where_you_can_put(self):
+        return self.manager.where_you_can_put()
+    
 
 
-class Checker:
+class Manager:
     """Model"""
 
     def __init__(self) -> None:
@@ -148,23 +175,23 @@ class Checker:
         NOTE: 空白のチェック
         """
         position = board[x][y]
-        if position.value.value['color'] != 'blank':
+        if position.value.value["color"] != "blank":
             return False
         else:
             return True
 
     def ops_color(self, input_tile, check_tile):
-        if check_tile.value.value['color'] == 'blank':
+        if check_tile.value.value["color"] == "blank":
             return False
-        elif check_tile.value.value['color'] == input_tile.value.value['color']:
+        elif check_tile.value.value["color"] == input_tile.value.value["color"]:
             return False
-        elif check_tile.value.value['color'] != input_tile.value.value['color']:
+        elif check_tile.value.value["color"] != input_tile.value.value["color"]:
             return True
 
     def same_color(self, input_tile, check_tile):
-        if check_tile.value.value['color'] == 'blank':
+        if check_tile.value.value["color"] == "blank":
             return False
-        elif check_tile.value.value['color'] == input_tile.value.value['color']:
+        elif check_tile.value.value["color"] == input_tile.value.value["color"]:
             return True
 
     def check_up(self, board, x, y, input_tile):
@@ -263,14 +290,11 @@ class Checker:
             position.append(self.check_upper_left(board, x, y, input_tile))
         return position
 
-    def position(self, board, input_tile):
-        """
-        置ける場所をリストでリターンする
-        """
+    def where_you_can_put(self, board, input_tile) -> List[Tuple]:
         checked_list = []
         for x in range(7):
             for y in range(7):
-                checked = Checker().adjacent_check(board, x, y, input_tile)
+                checked = self.adjacent_check(board, x, y, input_tile)
                 for i in checked:
                     if i is not None:
                         checked_list.append(i)
