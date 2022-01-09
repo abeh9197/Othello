@@ -5,34 +5,34 @@ from typing import List, Protocol, Tuple
 def game_start():
     """Model"""
     game = Game()
-    status = Status()
     init_board = Board(cells=None)
-    draw_board(init_board)
+    game.draw(init_board)
     while game.not_done:
         x, y = game.get_input()
         board = init_board
-        board = board.get_from_input(x, y, input_color=status.current_player)
-        status.change_player()
-        draw_board(board)
-
-
-def draw_board(board):
-    return DrawBoard(board)
-
+        board = board.get_from_input(x, y, input_color=game.status.current_player)
+        game.status.change_player()
+        game.draw(board)
 
 class Game:
     """Model"""
 
     def __init__(self):
         self.player = Player()
-
-    def get_input(self):
-        return self.player.player_input()
+        self.drawboard = DrawBoard()
+        self.status = Status()
 
     @property
     def not_done(self):
         done = 0
         return done == 0
+
+    def get_input(self):
+        return self.player.player_input()
+    
+    def draw(self, board):
+        return self.drawboard.draw(board=board, input_tile=Tile.from_number(self.status.current_player))
+
 
 
 class Player:
@@ -53,9 +53,9 @@ class Player:
 class TileValue(Enum):
     """Model"""
 
-    blank = {"color": "blank", "vis": "□", "num": -1}
-    dark = {"color": "dark", "vis": "○", "num": 0}
-    light = {"color": "light", "vis": "●", "num": 1}
+    BLANK = {"color": "blank", "vis": "□", "num": -1}
+    DARK = {"color": "dark", "vis": "○", "num": 0}
+    LIGHT = {"color": "light", "vis": "●", "num": 1}
 
     @staticmethod
     def from_number(num: int):
@@ -90,6 +90,7 @@ class Board:
 
     def __init__(self, cells=None):
         self.board_size: int = 8
+        self.manager = Manager()
         if cells is None:
             self.cells = self.init_board()
         else:
@@ -112,20 +113,19 @@ class Board:
         return self.board_size
 
     def get_from_input(self, x, y, input_color: int):
-        self.cells[x][y] = Tile.from_number(input_color)
-        print(self.cells)
+        self.cells[y][x] = Tile.from_number(input_color)
         return self
 
+    def where_you_can_put(self, board, input_tile: Tile) -> List[Tuple]:
+        return self.manager.where_you_can_put(board, input_tile=input_tile)
 
 class DrawBoard:
     """View"""
 
-    def __init__(self, board: Board):
-        self.board = board.cells
-        self.board_size = board.board_size
-        self.draw = self.drawboard()
+    def __init__(self):
+        pass
 
-    def drawboard(self):
+    def draw(self, board: Board, input_tile: Tile):
         """
         NOTE: 盤面を描写する
         """
@@ -136,8 +136,10 @@ class DrawBoard:
         col = [0, 1, 2, 3, 4, 5, 6, 7]
         print(*row)
         # print(self.board)
-        for b in range(self.board_size):
-            print(col[b], *self.board[b])
+        for b in range(board.board_size):
+            print(col[b], *board.cells[b])
+        
+        print(board.where_you_can_put(board=board, input_tile=input_tile))
 
 
 class Status:
@@ -146,17 +148,12 @@ class Status:
     def __init__(self) -> None:
         self.turn: int = 0
         self.current_player: int = 0
-        self.manager = Manager()
     
     def change_player(self):
         if self.current_player == 0:
             self.current_player = 1
         elif self.current_player == 1:
             self.current_player = 0
-    
-    def where_you_can_put(self):
-        return self.manager.where_you_can_put()
-    
 
 
 class Manager:
@@ -170,131 +167,153 @@ class Manager:
         col = int(input())
         return (row, col)
 
-    def check_blank(self, board, x, y) -> bool:
+    def check_blank(self, board: List[Tile], row: int, col: int) -> bool:
         """
         NOTE: 空白のチェック
         """
-        position = board[x][y]
-        if position.value.value["color"] != "blank":
+        position: Tile = board[col][row]
+        return position.value.value["color"] == "blank"
+
+    def valid_cell(self, x: int , y: int) -> bool:
+        return 0 <= x <= 7 and 0 <= y <= 7
+
+    def ops_color(self, input_tile: Tile, check_tile: Tile) -> bool:
+        if check_tile.value.value["color"] == ["blank"]:
             return False
         else:
-            return True
+            if input_tile.value.value["color"] == ["dark"]:
+                return check_tile.value.value["color"] == ["light"]
+            elif input_tile.value.value["color"] == ["light"]:
+                return check_tile.value.value["color"] == ["dark"]
 
-    def ops_color(self, input_tile, check_tile):
-        if check_tile.value.value["color"] == "blank":
+    def same_color(self, input_tile: Tile, check_tile: Tile) -> bool:
+        if check_tile.value.value["color"] == ["blank"]:
             return False
-        elif check_tile.value.value["color"] == input_tile.value.value["color"]:
-            return False
-        elif check_tile.value.value["color"] != input_tile.value.value["color"]:
-            return True
+        else:
+            return check_tile.value.value["color"] == input_tile.value.value["color"]
 
-    def same_color(self, input_tile, check_tile):
-        if check_tile.value.value["color"] == "blank":
-            return False
-        elif check_tile.value.value["color"] == input_tile.value.value["color"]:
-            return True
-
-    def check_up(self, board, x, y, input_tile):
-        up = y - 1
-        check_tile = board[x][up]
-        while self.ops_color(input_tile, check_tile):
-            up -= 1
-            check_tile = board[x][up]
-        if self.same_color(input_tile, check_tile):
-            return x, y
-
-    def check_upper_right(self, board, x, y, input_tile):
-        right = x + 1
-        up = y - 1
-        check_tile = board[right][up]
-        while self.ops_color(input_tile, check_tile):
-            right += 1
-            up -= 1
-            check_tile = board[right][up]
-        if self.same_color(input_tile, check_tile):
-            return x, y
-
-    def check_right(self, board, x, y, input_tile):
-        right = x + 1
-        check_tile = board[right][y]
-        while self.ops_color(input_tile, check_tile):
-            right += 1
-            check_tile = board[right][y]
-        if self.same_color(input_tile, check_tile):
-            return x, y
-
-    def check_lower_right(self, board, x, y, input_tile):
-        right = x + 1
-        lower = y + 1
-        check_tile = board[right][lower]
-        while self.ops_color(input_tile, check_tile):
-            right += 1
-            lower += 1
-            check_tile = board[right][lower]
-        if self.same_color(input_tile, check_tile):
-            return x, y
-
-    def check_low(self, board, x, y, input_tile):
-        low = y + 1
-        check_tile = board[x][low]
-        while self.ops_color(input_tile, check_tile):
-            low += 1
-            check_tile = board[x][low]
-        if self.same_color(input_tile, check_tile):
-            return x, y
-
-    def check_lower_left(self, board, x, y, input_tile):
-        left = x - 1
-        lower = y + 1
-        check_tile = board[left][lower]
-        while self.ops_color(input_tile, check_tile):
-            left -= 1
-            lower += 1
-            check_tile = board[left][lower]
-        if self.same_color(input_tile, check_tile):
-            return x, y
-
-    def check_left(self, board, x, y, input_tile):
-        left = x - 1
-        check_tile = board[left][y]
-        while self.ops_color(input_tile, check_tile):
-            left -= 1
-            check_tile = board[left][y]
-        if self.same_color(input_tile, check_tile):
-            return x, y
-
-    def check_upper_left(self, board, x, y, input_tile):
-        left = x - 1
-        upper = y - 1
-        check_tile = board[left][upper]
-        while self.ops_color(input_tile, check_tile):
-            left -= 1
-            upper -= 1
-            check_tile = board[left][upper]
-        if self.same_color(input_tile, check_tile):
-            return x, y
-
-    def adjacent_check(self, board, x, y, input_tile):
+    def check_upper_middle(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
         """
-        NOTE: 隣りあう石のチェック　もし空白であれば、その石の八方をチェック
+        となりに相手色の色があるという変数
+        かつその向こうに自分の色があるという変数
         """
+        up = col - 1
+        if self.valid_cell(row, up):
+            check_tile = board[up][row]
+            while self.ops_color(input_tile, check_tile):
+                up -= 1
+                check_tile = board[up][row]
+            return self.same_color(input_tile, check_tile)
+
+    def check_upper_right(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
+        right = row + 1
+        upper = col - 1
+        if self.valid_cell(upper, right):
+            check_tile = board[upper][right]
+            while self.ops_color(input_tile, check_tile):
+                right += 1
+                upper -= 1
+                check_tile = board[upper][right]
+            return self.same_color(input_tile, check_tile)
+
+    def check_middle_right(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
+        right = row + 1
+        if self.valid_cell(col, right):
+            check_tile = board[col][right]
+            while self.ops_color(input_tile, check_tile):
+                right += 1
+                check_tile = board[col][right]
+            return self.same_color(input_tile, check_tile)
+
+    def check_lower_right(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
+        right = row + 1
+        lower = col + 1
+        if self.valid_cell(lower, right):
+            check_tile = board[lower][right]
+            while self.ops_color(input_tile, check_tile):
+                right += 1
+                lower += 1
+                check_tile = board[lower][right]
+            return self.same_color(input_tile, check_tile)
+
+    def check_lower_middle(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
+        lower = col + 1
+        if self.valid_cell(lower, row):
+            check_tile = board[lower][row]
+            while self.ops_color(input_tile, check_tile):
+                lower += 1
+                check_tile = board[lower][row]
+            return self.same_color(input_tile, check_tile)
+
+    def check_lower_left(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
+        left = row - 1
+        lower = col + 1
+        if self.valid_cell(lower, left):
+            check_tile = board[lower][left]
+            while self.ops_color(input_tile, check_tile):
+                left -= 1
+                lower += 1
+                check_tile = board[lower][left]
+            return self.same_color(input_tile, check_tile)
+
+    def check_middle_left(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
+        left = row - 1
+        check_tile = board[col][left]
+        if self.valid_cell(col, left):
+            while self.ops_color(input_tile, check_tile):
+                left -= 1
+                check_tile = board[col][left]
+            return self.same_color(input_tile, check_tile)
+
+    def check_upper_left(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
+        left = row - 1
+        upper = col - 1
+        if self.valid_cell(upper, left):
+            check_tile = board[upper][left]
+            while self.ops_color(input_tile, check_tile):
+                left -= 1
+                upper -= 1
+                check_tile = board[upper][left]
+            return self.same_color(input_tile, check_tile)
+
+    def adjacent_check(self, board: List[Tile], row: int, col: int, input_tile: Tile):
+        """
+        NOTE: 隣りあう石のチェック もし空白であれば、その石の八方をチェック
+        """
+        print("CHECK ROW COL", row, col)
         position = []
-        if self.check_blank(board, x, y):  # 置きたい場所が空白かチェック
-            position.append(self.check_up(board, x, y, input_tile))
-            position.append(self.check_upper_right(board, x, y, input_tile))
-            position.append(self.check_right(board, x, y, input_tile))
-            position.append(self.check_lower_right(board, x, y, input_tile))
-            position.append(self.check_low(board, x, y, input_tile))
-            position.append(self.check_lower_left(board, x, y, input_tile))
-            position.append(self.check_left(board, x, y, input_tile))
-            position.append(self.check_upper_left(board, x, y, input_tile))
+        if self.check_blank(board, row, col):  # 置きたい場所が空白かチェック
+            if self.check_upper_middle(board, row=row, col=col, input_tile=input_tile):
+                print("upper_middle", row, col)
+                position.append((row, col))
+            if self.check_upper_right(board, row=row, col=col, input_tile=input_tile):
+                print("upper_right", row, col)
+                position.append((row, col))
+            if self.check_middle_right(board, row=row, col=col, input_tile=input_tile):
+                print("middle_right", row, col)
+                position.append((row, col))
+            if self.check_lower_right(board, row=row, col=col, input_tile=input_tile):
+                print("lower_right", row, col)
+                position.append((row, col))
+            if self.check_lower_middle(board, row=row, col=col, input_tile=input_tile):
+                print("lower_middle", row, col)
+                position.append((row, col))
+            if self.check_lower_left(board, row=row, col=col, input_tile=input_tile):
+                print("lower_left", row, col)
+                position.append((row, col))
+            if self.check_middle_left(board, row=row, col=col, input_tile=input_tile):
+                print("middle_left", row, col)
+                position.append((row, col))
+            if self.check_upper_left(board, row=row, col=col, input_tile=input_tile):
+                print("upper_left", row, col)
+                position.append((row, col))
         return position
 
-    def where_you_can_put(self, board, input_tile) -> List[Tuple]:
+    def where_you_can_put(self, board: Board, input_tile: Tile) -> List[Tuple]:
         checked_list = []
-        for x in range(7):
-            for y in range(7):
-                checked = self.adjacent_check(board, x, y, input_tile)
+        for row in range(8):
+            for col in range(8):
+                checked = self.adjacent_check(board.cells, row, col, input_tile)
                 for i in checked:
                     if i is not None:
                         checked_list.append(i)
