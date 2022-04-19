@@ -13,4 +13,3 @@ class Player:
         x = int(input("入力してください x : "))
         y = int(input("入力してください y : "))
         return x, y
-
