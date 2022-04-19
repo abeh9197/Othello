@@ -1,5 +1,5 @@
 import unittest
-from reversi import Board, DrawBoard, Tile, Game, TileValue, Checker
+from othello import Board, DrawBoard, Tile, Game, TileValue, Checker
 
 class UnitTest(unittest.TestCase):
 

@@ -1,4 +1,4 @@
-from reversi import game_start
+from othello import game_start
 
 def main():
     game_start()
