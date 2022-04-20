@@ -195,11 +195,15 @@ class Manager:
     def flip_upper_middle(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> List[Tuple]:
         positions_tile_flipped: List[Tuple] = []
         up = col - 1
+        if not self.valid_cell(up, row):
+            return positions_tile_flipped
         flip_tile = board[up][row]
         if self.ops_color(input_tile, flip_tile):
             positions_tile_flipped.append((up, row))
             while self.ops_color(input_tile, flip_tile):
                 up -= 1
+                if not self.valid_cell(up, row):
+                    return positions_tile_flipped
                 flip_tile = board[up][row]
                 if self.ops_color(input_tile, flip_tile):
                     positions_tile_flipped.append((up, row))
@@ -210,12 +214,16 @@ class Manager:
         positions_tile_flipped: List[Tuple] = []
         upper = col - 1
         right = row + 1
+        if not self.valid_cell(upper, right):
+            return positions_tile_flipped
         flip_tile = board[upper][right]
         if self.ops_color(input_tile, flip_tile):
             positions_tile_flipped.append((upper, right))
             while self.ops_color(input_tile, flip_tile):
                 upper -= 1
                 right += 1
+                if not self.valid_cell(upper, right):
+                    return positions_tile_flipped
                 flip_tile = board[upper][right]
                 if self.ops_color(input_tile, flip_tile):
                     positions_tile_flipped.append((upper, right))
@@ -225,11 +233,15 @@ class Manager:
     def flip_middle_right(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> List[Tuple]:
         positions_tile_flipped: List[Tuple] = []
         right = row + 1
+        if not self.valid_cell(col, right):
+            return positions_tile_flipped        
         flip_tile = board[col][right]
         if self.ops_color(input_tile, flip_tile):
             positions_tile_flipped.append((col, right))
             while self.ops_color(input_tile, flip_tile):
                 right += 1
+                if not self.valid_cell(col, right):
+                    return positions_tile_flipped
                 flip_tile = board[col][right]
                 if self.ops_color(input_tile, flip_tile):
                     positions_tile_flipped.append((col, right))
@@ -240,12 +252,16 @@ class Manager:
         positions_tile_flipped: List[Tuple] = []
         lower = col + 1
         right = row + 1
+        if not self.valid_cell(lower, right):
+            return positions_tile_flipped
         flip_tile = board[lower][right]
         if self.ops_color(input_tile, flip_tile):
             positions_tile_flipped.append((lower, right))
             while self.ops_color(input_tile, flip_tile):
                 lower += 1
                 right += 1
+                if not self.valid_cell(lower, right):
+                    return positions_tile_flipped
                 flip_tile = board[lower][right]
                 if self.ops_color(input_tile, flip_tile):
                     positions_tile_flipped.append((lower, right))
@@ -255,11 +271,15 @@ class Manager:
     def flip_lower_middle(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> List[Tuple]:
         positions_tile_flipped: List[Tuple] = []
         lower = col + 1
+        if not self.valid_cell(lower, row):
+            return positions_tile_flipped
         flip_tile = board[lower][row]
         if self.ops_color(input_tile, flip_tile):
             positions_tile_flipped.append((lower, row))
             while self.ops_color(input_tile, flip_tile):
                 lower += 1
+                if not self.valid_cell(lower, row):
+                    return positions_tile_flipped
                 flip_tile = board[lower][row]
                 if self.ops_color(input_tile, flip_tile):
                     positions_tile_flipped.append((lower, row))
@@ -270,12 +290,16 @@ class Manager:
         positions_tile_flipped: List[Tuple] = []
         lower = col + 1
         left = row - 1
+        if not self.valid_cell(lower, left):
+            return positions_tile_flipped
         flip_tile = board[lower][left]
         if self.ops_color(input_tile, flip_tile):
             positions_tile_flipped.append((lower, left))
             while self.ops_color(input_tile, flip_tile):
                 lower += 1
                 left -= 1
+                if not self.valid_cell(lower, left):
+                    return positions_tile_flipped
                 flip_tile = board[lower][left]
                 if self.ops_color(input_tile, flip_tile):
                     positions_tile_flipped.append((lower, left))
@@ -285,11 +309,15 @@ class Manager:
     def flip_middle_left(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> List[Tuple]:
         positions_tile_flipped: List[Tuple] = []
         left = row - 1
+        if not self.valid_cell(col, left):
+            return positions_tile_flipped
         flip_tile = board[col][left]
         if self.ops_color(input_tile, flip_tile):
             positions_tile_flipped.append((col, left))
             while self.ops_color(input_tile, flip_tile):
                 left -= 1
+                if not self.valid_cell(col, left):
+                    return positions_tile_flipped
                 flip_tile = board[col][left]
                 if self.ops_color(input_tile, flip_tile):
                     positions_tile_flipped.append((col, left))
@@ -300,12 +328,16 @@ class Manager:
         positions_tile_flipped: List[Tuple] = []
         upper = col - 1
         left = row - 1
+        if not self.valid_cell(upper, left):
+            return positions_tile_flipped
         flip_tile = board[upper][left]
         if self.ops_color(input_tile, flip_tile):
             positions_tile_flipped.append((upper, left))
             while self.ops_color(input_tile, flip_tile):
                 upper -= 1
                 left -= 1
+                if not self.valid_cell(upper, left):
+                    return positions_tile_flipped
                 flip_tile = board[upper][left]
                 if self.ops_color(input_tile, flip_tile):
                     positions_tile_flipped.append((upper, left))
