@@ -49,8 +49,9 @@ class Manager:
             if self.ops_color(input_tile, check_tile):
                 while self.ops_color(input_tile, check_tile):
                     up -= 1
-                    check_tile = board[up][row]
-                return self.same_color(input_tile, check_tile)
+                    if self.valid_cell(row, up):
+                        check_tile = board[up][row]
+                    return self.same_color(input_tile, check_tile)
 
     def check_upper_right(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
         right = row + 1
@@ -61,8 +62,9 @@ class Manager:
                 while self.ops_color(input_tile, check_tile):
                     right += 1
                     upper -= 1
-                    check_tile = board[upper][right]
-                return self.same_color(input_tile, check_tile)
+                    if self.valid_cell(upper, right):
+                        check_tile = board[upper][right]
+                    return self.same_color(input_tile, check_tile)
 
     def check_middle_right(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
         right = row + 1
@@ -71,8 +73,9 @@ class Manager:
             if self.ops_color(input_tile, check_tile):
                 while self.ops_color(input_tile, check_tile):
                     right += 1
-                    check_tile = board[col][right]
-                return self.same_color(input_tile, check_tile)
+                    if self.valid_cell(col, right):
+                        check_tile = board[col][right]
+                    return self.same_color(input_tile, check_tile)
 
     def check_lower_right(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
         right = row + 1
@@ -83,8 +86,9 @@ class Manager:
                 while self.ops_color(input_tile, check_tile):
                     right += 1
                     lower += 1
-                    check_tile = board[lower][right]
-                return self.same_color(input_tile, check_tile)
+                    if self.valid_cell(lower, right):
+                        check_tile = board[lower][right]
+                    return self.same_color(input_tile, check_tile)
 
     def check_lower_middle(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
         lower = col + 1
@@ -93,8 +97,9 @@ class Manager:
             if self.ops_color(input_tile, check_tile):
                 while self.ops_color(input_tile, check_tile):
                     lower += 1
-                    check_tile = board[lower][row]
-                return self.same_color(input_tile, check_tile)
+                    if self.valid_cell(lower, row):
+                        check_tile = board[lower][row]
+                    return self.same_color(input_tile, check_tile)
 
     def check_lower_left(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
         left = row - 1
@@ -105,8 +110,9 @@ class Manager:
                 while self.ops_color(input_tile, check_tile):
                     left -= 1
                     lower += 1
-                    check_tile = board[lower][left]
-                return self.same_color(input_tile, check_tile)
+                    if self.valid_cell(lower, left):
+                        check_tile = board[lower][left]
+                    return self.same_color(input_tile, check_tile)
 
     def check_middle_left(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
         left = row - 1
@@ -115,8 +121,9 @@ class Manager:
             if self.ops_color(input_tile, check_tile):
                 while self.ops_color(input_tile, check_tile):
                     left -= 1
-                    check_tile = board[col][left]
-                return self.same_color(input_tile, check_tile)
+                    if self.valid_cell(col, left):
+                        check_tile = board[col][left]
+                    return self.same_color(input_tile, check_tile)
 
     def check_upper_left(self, board: List[Tile], row: int, col: int, input_tile: Tile) -> bool:
         left = row - 1
@@ -127,8 +134,9 @@ class Manager:
                 while self.ops_color(input_tile, check_tile):
                     left -= 1
                     upper -= 1
-                    check_tile = board[upper][left]
-                return self.same_color(input_tile, check_tile)
+                    if self.valid_cell(upper, left):
+                        check_tile = board[upper][left]
+                    return self.same_color(input_tile, check_tile)
 
     def adjacent_check(self, board: List[Tile], row: int, col: int, input_tile: Tile):
         """
