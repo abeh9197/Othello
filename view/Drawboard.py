@@ -21,5 +21,10 @@ class DrawBoard:
         print(*row)
         for b in range(board.board_size):
             print(col[b], *board.cells[b])
+
+        where_you_can_put = list(set(self.manager.where_you_can_put(board=board, input_tile=input_tile)))
         
-        logger.info(f"置ける場所 {self.manager.where_you_can_put(board=board, input_tile=input_tile)}")
+        if len(where_you_can_put) > 0:
+            logger.info(f"置ける場所 {where_you_can_put}")
+        else:
+            logger.info(f"置ける場所がありません")
