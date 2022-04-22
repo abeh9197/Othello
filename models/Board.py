@@ -17,7 +17,7 @@ class Board:
     @property
     def _board_size(self):
         return self.board_size
-    
+
     def init_board(self) -> List:
         blank_cell = Tile.from_number(-1)
         board = [

@@ -20,7 +20,7 @@ class Game:
     def not_done(self):
         done = 0
         return done == 0
-    
+
     @property
     def input_tile(self):
         return Tile.from_number(self.status.current_player)
@@ -32,17 +32,30 @@ class Game:
         return self.player.player_input()
 
     def input_validation(self, row, col, board) -> bool:
-        positions_you_can_put = self.manager.where_you_can_put(board=board, input_tile=self.input_tile)
+        positions_you_can_put = self.manager.where_you_can_put(
+            board=board, input_tile=self.input_tile
+        )
         return (row, col) in positions_you_can_put
-    
+
     def draw(self, board):
         return self.drawboard.draw(board=board, input_tile=self.input_tile)
 
     def flip_tiles(self, board: Board, row: int, col: int) -> Board:
         return self.manager.flip_tiles(board, row, col, input_tile=self.input_tile)
-    
+
     def no_position_to_put(self, board: Board) -> bool:
-        return len(self.manager.where_you_can_put(board=board, input_tile=self.input_tile)) == 0
+        return (
+            self.manager.where_you_can_put(board=board, input_tile=Tile.from_number(0))
+            == 0
+            and self.manager.where_you_can_put(
+                board=board, input_tile=Tile.from_number(1)
+            )
+            == 0
+            or len(
+                self.manager.where_you_can_put(board=board, input_tile=self.input_tile)
+            )
+            == 0
+        )
 
     def end(self, board: Board) -> bool:
         return self.status.count_cell_type(board=board)["blank"] == 0

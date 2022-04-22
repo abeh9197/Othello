@@ -1,6 +1,7 @@
 from __future__ import annotations
 from enum import Enum
 
+
 class TileValue(Enum):
     """Model"""
 
@@ -30,14 +31,10 @@ class Tile:
 
     def __hash__(self) -> int:
         return int(self.value.value["num"])
-    
+
     def __eq__(self, other: Tile) -> bool:
         return self.value == other.value
 
     @staticmethod
     def from_number(n: int):
         return Tile(TileValue.from_number(n))
-
-
-
-
