@@ -4,6 +4,8 @@ from view.Drawboard import DrawBoard
 from models.Status import Status
 from models.Tile import Tile
 from models.Board import Board
+from utils.log import logger
+
 
 class Game:
     """Model"""
@@ -43,4 +45,13 @@ class Game:
         return len(self.manager.where_you_can_put(board=board, input_tile=self.input_tile)) == 0
 
     def end(self, board: Board) -> bool:
-        pass
+        return self.status.count_cell_type(board=board)["blank"] == 0
+
+    def show_result(self, board: Board) -> None:
+        result: dict = self.status.count_cell_type(board=board)
+        if result["dark"] > result["light"]:
+            logger.info("黒の勝ち！")
+        if result["dark"] < result["light"]:
+            logger.info("白の勝ち！")
+        if result["dark"] == result["light"]:
+            logger.info("引き分け")

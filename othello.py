@@ -24,6 +24,7 @@ def game_start():
                 logger.info("そこには置けません")
         elif game.end(board=board):
             logger.info("----- game end -----")
+            game.show_result(board=board)
             break
         else:
             logger.info("置ける場所がありません")
