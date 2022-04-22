@@ -1,5 +1,6 @@
 from models.Game import Game
 from models.Board import Board
+from models.Tile import Tile
 from utils.log import logger
 
 
@@ -16,8 +17,12 @@ def game_start():
             row, col = game.get_input()
             """validation"""
             if game.input_validation(row, col, init_board):
-                board_not_flipped = board.get_from_input(row=row, col=col, input_color=game.status.current_player)
-                board_tiles_flipped = game.flip_tiles(board_not_flipped, row=row, col=col)
+                board_not_flipped = board.get_from_input(
+                    row=row, col=col, input_color=game.status.current_player
+                )
+                board_tiles_flipped = game.flip_tiles(
+                    board_not_flipped, row=row, col=col
+                )
                 game.status.change_player()
                 game.draw(board_tiles_flipped)
             else:

@@ -1,6 +1,7 @@
 from typing import Tuple
 from utils.log import logger
 
+
 class Player:
     """Controller"""
 
@@ -16,7 +17,7 @@ class Player:
 
         if self.input_validation(x, y):
             return int(x), int(y)
-        
+
         else:
             logger.info("無効な入力がありました。もう一度入力してください。")
             return self.player_input()
