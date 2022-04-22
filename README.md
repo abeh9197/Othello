@@ -2,3 +2,13 @@
 
 ## TODO
 - adjacent_checkでのvalidation
+
+
+
+
+
+
+
+
+
+## ののど. 

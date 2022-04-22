@@ -18,10 +18,6 @@ class Board:
     def _board_size(self):
         return self.board_size
     
-    @property
-    def count_blank(self) -> int:
-        return self.cells.count("")
-
     def init_board(self) -> List:
         blank_cell = Tile.from_number(-1)
         board = [
@@ -32,7 +28,6 @@ class Board:
         board[4][3] = Tile.from_number(1)
         board[4][4] = Tile.from_number(0)
         self.cells = board
-        print(self.cells)
         return self.cells
 
     def get_from_input(self, row: int, col: int, input_color: int):
