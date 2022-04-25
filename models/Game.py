@@ -44,18 +44,13 @@ class Game:
         return self.manager.flip_tiles(board, row, col, input_tile=self.input_tile)
 
     def no_position_to_put(self, board: Board) -> bool:
-        return (
-            self.manager.where_you_can_put(board=board, input_tile=Tile.from_number(0))
-            == 0
-            and self.manager.where_you_can_put(
+        if len(self.manager.where_you_can_put(board=board, input_tile=Tile.from_number(0))) == 0 and len(self.manager.where_you_can_put(
                 board=board, input_tile=Tile.from_number(1)
-            )
-            == 0
-            or len(
-                self.manager.where_you_can_put(board=board, input_tile=self.input_tile)
-            )
-            == 0
-        )
+            )) == 0:
+            return True
+        if len(self.manager.where_you_can_put(board=board, input_tile=self.input_tile)) == 0:
+            return True
+        return False
 
     def end(self, board: Board) -> bool:
         return self.status.count_cell_type(board=board)["blank"] == 0
