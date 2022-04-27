@@ -15,6 +15,9 @@ def game_start():
         if not game.no_position_to_put(board=board):
             logger.info(game.log_whos_turn())
             row, col = game.get_input()
+
+            # autoplay
+            # row, col = game.manager.where_you_can_put(board=board, input_tile=Tile.from_number(game.status.current_player))[0]
             """validation"""
             if game.input_validation(row, col, init_board):
                 board_not_flipped = board.get_from_input(
