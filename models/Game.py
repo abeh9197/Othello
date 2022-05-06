@@ -69,6 +69,9 @@ class Game:
 
     def show_result(self, board: Board) -> None:
         result: dict = self.status.count_cell_type(board=board)
+        count_dark = result["dark"]
+        count_light = result["light"]
+        logger.info(f"黒 {count_dark} 白 {count_light}")
         if result["dark"] > result["light"]:
             logger.info("黒の勝ち！")
         if result["dark"] < result["light"]:
