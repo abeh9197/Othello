@@ -5,9 +5,10 @@ from models.Tile import Tile
 from utils.log import logger
 
 
-def game_start():
+def game_start(autoplay: bool):
     """Model"""
     logger.info("----- game start -----")
+    logger.info("auto-play : %s", autoplay)
     game = Game()
     init_board = Board(cells=None)
     game.draw(init_board)
@@ -15,10 +16,12 @@ def game_start():
         board = init_board
         if not game.no_position_to_put(board=board):
             logger.info(game.log_whos_turn())
-            # row, col = game.get_input()
 
             # autoplay
-            row, col = random.choice(game.manager.where_you_can_put(board=board, input_tile=Tile.from_number(game.status.current_player)))
+            if autoplay:
+                row, col = random.choice(game.manager.where_you_can_put(board=board, input_tile=Tile.from_number(game.status.current_player)))
+            else:
+                row, col = game.get_input()
             """validation"""
             if game.input_validation(row, col, init_board):
                 board_not_flipped = board.get_from_input(
