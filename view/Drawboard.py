@@ -17,12 +17,12 @@ class DrawBoard:
         NOTE: 盤面を描写する
         """
         print("   1  2  3  4  5  6  7  8")
-        print("  ------------------------")
+        print("  +--+--+--+--+--+--+--+--+")
         for i in range(board.board_size):
             print(i+1, "|", end="")
             for j in range(8):
                 print(board.cells[i][j], "|", end="")
-            print("\n  ------------------------")
+            print("\n  +--+--+--+--+--+--+--+--+")
 
         where_you_can_put = list(
             set(self.manager.where_you_can_put(board=board, input_tile=input_tile))
