@@ -5,7 +5,7 @@ from enum import Enum
 class TileValue(Enum):
     """Model"""
 
-    BLANK = {"color": "blank", "vis": "□", "num": -1}
+    BLANK = {"color": "blank", "vis": " ", "num": -1}
     DARK = {"color": "dark", "vis": "○", "num": 0}
     LIGHT = {"color": "light", "vis": "●", "num": 1}
 

@@ -16,7 +16,7 @@ class Player:
         y = input("入力してください y : ")
 
         if self.input_validation(x, y):
-            return int(x), int(y)
+            return int(x)-1, int(y)-1
 
         else:
             logger.info("無効な入力がありました。もう一度入力してください。")

@@ -16,18 +16,18 @@ class DrawBoard:
         """
         NOTE: 盤面を描写する
         """
-        """
-        FIXME: のちのちrow, colを1〜8にしたい（入力と整合性をとる）
-        """
-        row = ["\nX", 0, 1, 2, 3, 4, 5, 6, 7]
-        col = [0, 1, 2, 3, 4, 5, 6, 7]
-        print(*row)
-        for b in range(board.board_size):
-            print(col[b], *board.cells[b])
+        print("   1  2  3  4  5  6  7  8")
+        print("  ------------------------")
+        for i in range(board.board_size):
+            print(i+1, "|", end="")
+            for j in range(8):
+                print(board.cells[i][j], "|", end="")
+            print("\n  ------------------------")
 
         where_you_can_put = list(
             set(self.manager.where_you_can_put(board=board, input_tile=input_tile))
         )
+        where_you_can_put = [(position[0] + 1, position[1] + 1) for position in where_you_can_put]
 
         if len(where_you_can_put) > 0:
             logger.info(f"残り {self.status.count_cell_type(board=board)}")
