@@ -8,6 +8,7 @@ class TileValue(Enum):
     BLANK = {"color": "blank", "vis": " ", "num": -1}
     DARK = {"color": "dark", "vis": "○", "num": 0}
     LIGHT = {"color": "light", "vis": "●", "num": 1}
+    CURSOR = {"color": None, "vis": "★", "num": 9}
 
     @staticmethod
     def from_number(num: int):
