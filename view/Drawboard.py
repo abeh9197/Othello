@@ -1,3 +1,4 @@
+import copy
 import readchar
 from models.Board import Board
 from models.Tile import Tile
@@ -12,13 +13,22 @@ class DrawBoard:
     def __init__(self):
         self.manager = Manager()
         self.status = Status()
+        self.__previous_cursor_row = 0
+        self.__previous_cursor_col = 0
+        self.__previous_tile = None
 
     def __draw(self, board: Board, input_tile: Tile, cursor_row: int, cursor_col: int):
         """
         NOTE: 盤面を描写する
         """
-        board_ = board.cells[:]
+        board_ = copy.deepcopy(board.cells)
+        if self.__previous_tile is not None:
+            board_[self.__previous_cursor_row][self.__previous_cursor_col] = self.__previous_tile
+
+        board_[cursor_row][cursor_col] = Tile.from_number(9)
         cursor = Tile.from_number(9)
+
+        logger.debug("[DrawBoard Debug] cursor position: %s, %s", cursor_row + 1, cursor_col + 1)
         print("   1  2  3  4  5  6  7  8")
         print("  +--+--+--+--+--+--+--+--+")
         for i in range(board.board_size):
@@ -40,6 +50,9 @@ class DrawBoard:
         else:
             logger.info(f"置ける場所がありません")
 
+        self.__previous_cursor_row = cursor_row
+        self.__previous_cursor_col = cursor_col
+
     def draw(self, board: Board, input_tile: Tile) -> None:
         cursor_row = 0
         cursor_col = 0
@@ -54,7 +67,7 @@ class DrawBoard:
                 cursor_col = max(0, cursor_col-1)
             elif key == readchar.key.RIGHT:
                 cursor_col = min(len(board.cells[0])-1, cursor_col+1)
-            elif key == '\r':
-                # Enter key pressed
+            elif key == '\r' or key == '\n' or key == readchar.key.ENTER:
+                print("[DrawBoard Debug] draw : Enter key pressed")
                 break
             self.__draw(board, input_tile, cursor_row, cursor_col)
